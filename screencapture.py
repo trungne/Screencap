@@ -9,7 +9,6 @@ def main():
 
     def update(entry, status, curselection):
         # check if user has selected a monitor
-        print(curselection)
         if curselection:  # curseselection return (n,) with n = number of the selection
             monitor = curselection[0]
             filename = entry.get() + '.png'
@@ -50,6 +49,7 @@ def main():
     screenshot_button.grid(row=2, column=0)
     statusBar.grid(row=3, column=0)
     listBox.grid(row=4, column=0)
+    
     # mainloop
     root.mainloop()
 
