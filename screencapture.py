@@ -34,7 +34,9 @@ def main():
                                padx=50, pady=20,
                                command=lambda: update(inputBox, statusBar, listBox.curselection()))
     statusBar = Label(root)
-
+    var1 = IntVar()
+    screenshot_mode = Checkbutton(root, text='Continuous snapping', variable=var1)
+    
     # create options for monitors
     listBox = Listbox(root)
     for i in range(len(mss.mss().monitors)):
@@ -49,7 +51,7 @@ def main():
     screenshot_button.grid(row=2, column=0)
     statusBar.grid(row=3, column=0)
     listBox.grid(row=4, column=0)
-    
+    screenshot_mode.grid(row=2, column=1)
     # mainloop
     root.mainloop()
 
