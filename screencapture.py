@@ -21,16 +21,19 @@ def main():
             return
 
         monitor = curselection[0]
-
         filename = entry.get()
-        i = 1
-        # check if filename already exists
-        while os.path.isfile(filename + '.png'):
-            filename = entry.get() + '-' + str(i)  # rename the file if it already exists
-            i += 1
-        screenshot(filename, monitor)  # screenshot!
+
+        if var1.get():
+
+            time.sleep(3)
+        else:
+            i = 1
+            # check if filename already exists
+            while os.path.isfile(filename + '.png'):
+                filename = entry.get() + '-' + str(i)  # rename the file if it already exists
+                i += 1
+            screenshot(filename, monitor)  # screenshot!
         status['text'] = filename + '.png captured!'  # display result
-        print(var1.get())
     # create widgets
     instruction = Label(root, text='Enter the filename: ')
     inputBox = Entry(root, width=50)
