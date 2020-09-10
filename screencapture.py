@@ -1,5 +1,6 @@
 import mss
 import os
+import time
 from tkinter import *
 
 
@@ -10,25 +11,26 @@ def main():
 
     def update(entry, status, curselection):
         # check if user has selected a monitor
-        if curselection:  # curseselection return (n,) with n = number of the selection
-            monitor = curselection[0]
-        else:
+        if not curselection:  # curseselection return (n,) with n = number of the selection
             status['text'] = 'Please select a monitor!'
-            return 1
+            return
 
-        # check if user enters text in the input box
-        if entry.get():
-            # check if filename already exists
-            filename = entry.get()
-            i = 1
-            while os.path.isfile(filename + '.png'):
-                filename = entry.get() + '-' + str(i)
-                i += 1
-            screenshot(filename, monitor)
-            status['text'] = filename + '.png captured!'
-        else:
+        # check if user has entered text in the input box
+        if not entry.get():
             status['text'] = 'Please enter something!'
+            return
 
+        monitor = curselection[0]
+
+        filename = entry.get()
+        i = 1
+        # check if filename already exists
+        while os.path.isfile(filename + '.png'):
+            filename = entry.get() + '-' + str(i)  # rename the file if it already exists
+            i += 1
+        screenshot(filename, monitor)  # screenshot!
+        status['text'] = filename + '.png captured!'  # display result
+        print(var1.get())
     # create widgets
     instruction = Label(root, text='Enter the filename: ')
     inputBox = Entry(root, width=50)
@@ -38,7 +40,7 @@ def main():
     statusBar = Label(root, bd=10)
     var1 = IntVar()
     screenshot_mode = Checkbutton(selection, text='Continuous snapping', variable=var1)
-    
+
     # create options for monitors
     listBox = Listbox(root)
     for i in range(len(mss.mss().monitors)):
