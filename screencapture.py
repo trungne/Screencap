@@ -89,13 +89,13 @@ def screenshot(filename, monitor_number):
         mon = sct.monitors[monitor_number]
 
         # The screen part to capture. activate this part if a portion of a screen is needed
-        monitor = {
-            "top": mon["top"],
-            "left": mon["left"],
-            "width": mon["width"],
-            "height": mon["height"],
-            "mon": monitor_number,
-        }
+        # monitor = {
+        #     "top": mon["top"],
+        #     "left": mon["left"],
+        #     "width": mon["width"],
+        #     "height": mon["height"],
+        #     "mon": monitor_number,
+        # }
         # output = "sct-mon{mon}_{top}x{left}_{width}x{height}.png".format(**monitor)
 
         # Grab the data
