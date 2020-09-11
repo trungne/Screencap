@@ -33,9 +33,9 @@ def main():
         monitor = curselection[0]
         filename = entry.get()
 
-        if var1.get():
-
-            time.sleep(3)
+        if var1.get():  # when continuous snapping box is ticked
+            # TODO: CREATE FUNCTION TO DEAL WITH CONTINUOUS SNAPPING!
+            pass
         else:
             i = 1
             # check if filename already exists
@@ -74,6 +74,7 @@ def main():
     statusBar.grid(row=2, column=0)
     screenshot_button.grid(row=3, column=0)
     listBox.grid(row=4, column=0)
+
     # selection frame
     selection.grid(row=5, column=0)
     screenshot_mode.grid(row=0, column=0)
