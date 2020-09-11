@@ -88,7 +88,7 @@ def screenshot(filename, monitor_number):
         # Get information of the monitor
         mon = sct.monitors[monitor_number]
 
-        # The screen part to capture
+        # The screen part to capture. activate this part if a portion of a screen is needed
         monitor = {
             "top": mon["top"],
             "left": mon["left"],
@@ -99,7 +99,7 @@ def screenshot(filename, monitor_number):
         # output = "sct-mon{mon}_{top}x{left}_{width}x{height}.png".format(**monitor)
 
         # Grab the data
-        sct_img = sct.grab(monitor)
+        sct_img = sct.grab(mon)
 
         # Save to the picture file
         mss.tools.to_png(sct_img.rgb, sct_img.size, output=filename + '.png')
