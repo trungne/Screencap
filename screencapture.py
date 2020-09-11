@@ -83,7 +83,6 @@ def main():
     root.mainloop()
 
 
-# Screenshot part of the screen of the second monitor
 def screenshot(filename, monitor_number):
     with mss.mss() as sct:
         # Get information of the monitor
