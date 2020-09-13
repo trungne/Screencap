@@ -2,8 +2,7 @@ import tkinter as tk
 import mss
 import os
 import string
-import playsound
-
+import pygame
 
 class NoFilenameEntered(Exception):
     pass
@@ -11,6 +10,7 @@ class NoFilenameEntered(Exception):
 
 class MainMenu(tk.Frame):
     def __init__(self, parent):
+        pygame.mixer.init()
         # inherent from tk.Frame
         super().__init__(parent)
         # show the Frame.
@@ -59,6 +59,9 @@ class MainMenu(tk.Frame):
         self.stop_button = tk.Button(self, text='Stop',
                                      padx=70, pady=20, command=self.stop_snapping)
 
+        # create sound effects
+        self.capture_sound = pygame.mixer.Sound('capturesound.wav')
+
     def scanning(self):
         ''' This scanning function run recursively to create an infinitive loop to
         continuously check if user has clicked screenshot button '''
@@ -98,13 +101,14 @@ class MainMenu(tk.Frame):
         # get the target monitor to capture and create an appropriate filename
         monitor_number = self.monitor_number.get()
         filename = self.create_appropriate_filename()
-
+        
+        self.play_sound()
         # screenshot and generate png file
         with mss.mss() as sct:
             mon = sct.monitors[monitor_number]
             sct_img = sct.grab(mon)
             mss.tools.to_png(sct_img.rgb, sct_img.size, output=filename + '.png')
-        playsound.playsound('screencapturesound.mp3')
+        
         # display result accordingly
         self.status_bar['text'] = f"{filename}.png captured!"
 
@@ -133,12 +137,15 @@ class MainMenu(tk.Frame):
     def start_snapping(self):
         # only activate snapping when all inputs are valid
         if self.check_valid_inputs():
+            
             self.snapping = True
 
     def stop_snapping(self):
         self.snapping = False
 
-
+    def play_sound(self):
+        self.capture_sound.play()
+        
 def main():
     root = tk.Tk()
     root.resizable(False, False)
