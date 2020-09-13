@@ -13,6 +13,7 @@ class MainMenu(tk.Frame):
         # inherent from tk.Frame
         super().__init__(parent)
         # show the Frame.
+
         self.pack()
         self.parent = parent
         # snapping option is False by default
@@ -128,6 +129,8 @@ class MainMenu(tk.Frame):
 
 def main():
     root = tk.Tk()
+    root.resizable(False, False)
+    root.title("Screen Capture")
     app = MainMenu(root)
     root.mainloop()
 
