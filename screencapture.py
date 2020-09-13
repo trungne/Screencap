@@ -59,10 +59,12 @@ class MainMenu(tk.Frame):
         if self.snapping:
             self.screenshot()
             if self.screenshot_mode_check_variable.get():
-                self.after(1000 * self.interval.get(), self.scanning)
+                self.after(1000*self.interval.get(), self.scanning)
             else:
                 self.snapping = False
-        self.after(1, self.scanning)
+                self.after(1, self.scanning)
+        else:
+            self.after(1, self.scanning)
 
     def show_continuous_snapping_widgets(self):
         # if the continuous snapping option is ticked, show its widgets
