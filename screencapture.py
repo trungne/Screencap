@@ -13,14 +13,16 @@ class MainMenu(tk.Frame):
         # inherent from tk.Frame
         super().__init__(parent)
         # show the Frame.
-
         self.pack()
         self.parent = parent
-        # snapping option is False by default
-        self.snapping = False
+
+        '''The program continuously scans to see if user has pressed screenshot button
+        When the screenshot button is press, self.snapping is changed to True
+        Then the program will capture screen according to the screenshot mode (single or continuous)'''
+        self.snapping = False  # snapping option is False by default
         self.after(1, self.scanning)
 
-        # widgets in main menu
+        # create widgets in main menu
         self.instruction = tk.Label(self, text='Enter the filename: ')
         self.input_filename_box = tk.Entry(self, width=50)
         self.status_bar = tk.Label(self, bd=10)
@@ -38,29 +40,35 @@ class MainMenu(tk.Frame):
 
         # display radiobutton for user to select target monitor
         self.monitor_number = tk.IntVar()
+
         self.monitor_radiobutton = tk.Radiobutton(self, text="All monitors",
-                                                  variable=self.monitor_number, value=0)
-        self.monitor_radiobutton.pack()
-        for i in range(1, len(mss.mss().monitors)):
+                                                  variable=self.monitor_number,
+                                                  value=0)  # create radiobutton for all monitors
+        self.monitor_radiobutton.pack()  # display the radiobutton
+        for i in range(1, len(mss.mss().monitors)):  # create radiobutton for other monitors
             self.monitor_radiobutton = tk.Radiobutton(self, text=f"Monitor {i}",
                                                       variable=self.monitor_number, value=i)
-            self.monitor_radiobutton.pack()
+            self.monitor_radiobutton.pack()  # display the radiobutton
 
         # display check_button for user to select screenshot mode
         self.screenshot_mode_check_button.pack()
 
-        # widgets in continuous snapping menu - NOT DISPLAY UNTIL THE MODE IS TICKED
+        # create widgets in continuous snapping menu - NOT DISPLAY UNTIL THE MODE IS TICKED
         self.interval = tk.Scale(self, from_=1, to=10, orient=tk.HORIZONTAL)
         self.interval.set(1)
         self.stop_button = tk.Button(self, text='Stop',
                                      padx=70, pady=20, command=self.stop_snapping)
 
     def scanning(self):
+        ''' This scanning function run recursively to create an infinitive loop to
+        continuously check if user has clicked screenshot button '''
         if self.snapping:
-            self.screenshot()
+            self.screenshot()  # take a screenshot if self.snapping is True
             if self.screenshot_mode_check_variable.get():
-                self.after(1000*self.interval.get(), self.scanning)
+                # if continuous mode is ticked, recursively call self.scanning with a delay of 1000ms * interval
+                self.after(1000 * self.interval.get(), self.scanning)
             else:
+                # if continuous mode is not ticked, turn off snapping and recursively call self.scanning
                 self.snapping = False
                 self.after(1, self.scanning)
         else:
@@ -71,7 +79,7 @@ class MainMenu(tk.Frame):
         if self.screenshot_mode_check_variable.get():
             self.interval.pack()
             self.stop_button.pack()
-        # stop snapping when the option is unticked, also remove its widgets
+        # when the option is unticked remove its widgets, also stop self.snapping
         else:
             self.stop_snapping()
             self.interval.pack_forget()
@@ -87,7 +95,7 @@ class MainMenu(tk.Frame):
         return filename
 
     def screenshot(self):
-        # get the target monitor to capture and the filename
+        # get the target monitor to capture and create an appropriate filename
         monitor_number = self.monitor_number.get()
         filename = self.create_appropriate_filename()
 
@@ -101,8 +109,10 @@ class MainMenu(tk.Frame):
         self.status_bar['text'] = f"{filename}.png captured!"
 
     def raise_error_for_invalid_inputs(self):
+        # check if the user has entered filename
         if not self.input_filename_box.get():
             raise NoFilenameEntered
+        # check if there is any punctuation in the filename
         if any(char in set(string.punctuation) for char in self.input_filename_box.get()):
             raise TypeError
 
