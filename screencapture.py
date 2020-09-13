@@ -4,63 +4,73 @@ import os
 import string
 
 
-class NoMonitorSelected(Exception):
-    pass
-
-
 class NoFilenameEntered(Exception):
     pass
 
 
 class MainMenu(tk.Frame):
     def __init__(self, parent):
+        # inherent from tk.Frame
         super().__init__(parent)
+        # show the Frame.
         self.pack()
         self.parent = parent
+        # snapping option is False by default
         self.snapping = False
         self.after(1, self.scanning)
+
         # widgets in main menu
         self.instruction = tk.Label(self, text='Enter the filename: ')
         self.input_filename_box = tk.Entry(self, width=50)
         self.status_bar = tk.Label(self, bd=10)
         self.screenshot_button = tk.Button(self, text='Screen cap!',
-                                           padx=50, pady=20, command=self.screenshot)
-        self.button_check = tk.IntVar()  # a variable to track if user has ticked continuous snapping
-        self.screenshot_mode = tk.Checkbutton(self, text='Continuous snapping', variable=self.button_check,
-                                              command=self.show_continuous_snapping_widgets)
-        self.list_of_monitors = tk.Listbox(self, selectmode=tk.SINGLE)
-        self.list_of_monitors.insert(tk.END, "All monitors")
-        for i in range(1, len(mss.mss().monitors)):
-            self.list_of_monitors.insert(tk.END, f"Monitor {i}")
-
+                                           padx=50, pady=20, command=self.start_snapping)
+        self.screenshot_mode_check_variable = tk.IntVar()  # a variable to track if user has ticked continuous snapping
+        self.screenshot_mode_check_button = tk.Checkbutton(self, text='Continuous snapping',
+                                                           variable=self.screenshot_mode_check_variable,
+                                                           command=self.show_continuous_snapping_widgets)
         # display main widgets
         self.instruction.pack()
         self.input_filename_box.pack()
         self.status_bar.pack()
         self.screenshot_button.pack()
-        self.list_of_monitors.pack()
-        self.screenshot_mode.pack()
+
+        # display radiobutton for user to select target monitor
+        self.monitor_number = tk.IntVar()
+        self.monitor_radiobutton = tk.Radiobutton(self, text="All monitors",
+                                                  variable=self.monitor_number, value=0)
+        self.monitor_radiobutton.pack()
+        for i in range(1, len(mss.mss().monitors)):
+            self.monitor_radiobutton = tk.Radiobutton(self, text=f"Monitor {i}",
+                                                      variable=self.monitor_number, value=i)
+            self.monitor_radiobutton.pack()
+
+        # display check_button for user to select screenshot mode
+        self.screenshot_mode_check_button.pack()
 
         # widgets in continuous snapping menu - NOT DISPLAY UNTIL THE MODE IS TICKED
         self.interval = tk.Scale(self, from_=1, to=10, orient=tk.HORIZONTAL)
         self.interval.set(1)
         self.stop_button = tk.Button(self, text='Stop',
-                                     padx=70, pady=20, command=self.stop_continuous_snapping)
+                                     padx=70, pady=20, command=self.stop_snapping)
 
     def scanning(self):
         if self.snapping:
-            self.single_screenshot()
-            if self.button_check.get():
+            self.screenshot()
+            if self.screenshot_mode_check_variable.get():
                 self.after(1000 * self.interval.get(), self.scanning)
             else:
                 self.snapping = False
         self.after(1, self.scanning)
 
     def show_continuous_snapping_widgets(self):
-        if self.button_check.get():
+        # if the continuous snapping option is ticked, show its widgets
+        if self.screenshot_mode_check_variable.get():
             self.interval.pack()
             self.stop_button.pack()
+        # stop snapping when the option is unticked, also remove its widgets
         else:
+            self.stop_snapping()
             self.interval.pack_forget()
             self.stop_button.pack_forget()
 
@@ -73,9 +83,9 @@ class MainMenu(tk.Frame):
             i += 1
         return filename
 
-    def single_screenshot(self):
-        # get the target monitor to screencap and the filename
-        monitor_number = self.list_of_monitors.curselection()[0]
+    def screenshot(self):
+        # get the target monitor to capture and the filename
+        monitor_number = self.monitor_number.get()
         filename = self.create_appropriate_filename()
 
         # screenshot and generate png file
@@ -87,29 +97,32 @@ class MainMenu(tk.Frame):
         # display result accordingly
         self.status_bar['text'] = f"{filename}.png captured!"
 
-    def screenshot(self):
-        # try checking for valid inputs
-        try:
-            self.check_valid_inputs()
-        except NoMonitorSelected:  # Display ERROR when no monitor is selected
-            self.status_bar['text'] = 'Please select a monitor!'
-        except NoFilenameEntered:  # Display ERROR when no filename is entered
-            self.status_bar['text'] = 'Please enter something!'
-        except TypeError:
-            self.status_bar['text'] = 'Invalid filename!'
-        # if successful, take screenshot
-        else:
-            self.snapping = True
-
-    def check_valid_inputs(self):
-        if not self.list_of_monitors.curselection():
-            raise NoMonitorSelected
+    def raise_error_for_invalid_inputs(self):
         if not self.input_filename_box.get():
             raise NoFilenameEntered
         if any(char in set(string.punctuation) for char in self.input_filename_box.get()):
             raise TypeError
 
-    def stop_continuous_snapping(self):
+    def check_valid_inputs(self):
+        # try checking for valid inputs
+        try:
+            self.raise_error_for_invalid_inputs()
+        except NoFilenameEntered:  # Display ERROR when no filename is entered
+            self.status_bar['text'] = 'Please enter something!'
+        except TypeError:
+            self.status_bar['text'] = 'Invalid filename!'
+        except:
+            self.status_bar['text'] = 'Something is wrong!'
+        else:
+            return True
+        return False
+
+    def start_snapping(self):
+        # only activate snapping when all inputs are valid
+        if self.check_valid_inputs():
+            self.snapping = True
+
+    def stop_snapping(self):
         self.snapping = False
 
 
