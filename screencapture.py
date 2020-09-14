@@ -4,6 +4,9 @@ import os
 import string
 import pygame
 
+pygame.init()
+
+
 class NoFilenameEntered(Exception):
     pass
 
@@ -32,6 +35,9 @@ class MainMenu(tk.Frame):
         self.screenshot_mode_check_button = tk.Checkbutton(self, text='Continuous snapping',
                                                            variable=self.screenshot_mode_check_variable,
                                                            command=self.show_continuous_snapping_widgets)
+        self.sound = tk.IntVar()
+        self.sound_check_button = tk.Checkbutton(self, text='Sound', variable=self.sound)
+
         # display main widgets
         self.instruction.pack()
         self.input_filename_box.pack()
@@ -40,10 +46,10 @@ class MainMenu(tk.Frame):
 
         # display radiobutton for user to select target monitor
         self.monitor_number = tk.IntVar()
-
         self.monitor_radiobutton = tk.Radiobutton(self, text="All monitors",
                                                   variable=self.monitor_number,
                                                   value=0)  # create radiobutton for all monitors
+
         self.monitor_radiobutton.pack()  # display the radiobutton
         for i in range(1, len(mss.mss().monitors)):  # create radiobutton for other monitors
             self.monitor_radiobutton = tk.Radiobutton(self, text=f"Monitor {i}",
@@ -52,6 +58,7 @@ class MainMenu(tk.Frame):
 
         # display check_button for user to select screenshot mode
         self.screenshot_mode_check_button.pack()
+        self.sound_check_button.pack()
 
         # create widgets in continuous snapping menu - NOT DISPLAY UNTIL THE MODE IS TICKED
         self.interval = tk.Scale(self, from_=1, to=10, orient=tk.HORIZONTAL)
@@ -60,7 +67,8 @@ class MainMenu(tk.Frame):
                                      padx=70, pady=20, command=self.stop_snapping)
 
         # create sound effects
-        self.capture_sound = pygame.mixer.Sound('capturesound.wav')
+        self.capture_sound = pygame.mixer.Sound('./sound/capturesound.wav')
+        self.stop_sound = pygame.mixer.Sound('./sound/converted_stopsound.wav')
 
     def scanning(self):
         ''' This scanning function run recursively to create an infinitive loop to
@@ -101,14 +109,14 @@ class MainMenu(tk.Frame):
         # get the target monitor to capture and create an appropriate filename
         monitor_number = self.monitor_number.get()
         filename = self.create_appropriate_filename()
-        
+
         self.play_sound()
         # screenshot and generate png file
         with mss.mss() as sct:
             mon = sct.monitors[monitor_number]
             sct_img = sct.grab(mon)
             mss.tools.to_png(sct_img.rgb, sct_img.size, output=filename + '.png')
-        
+
         # display result accordingly
         self.status_bar['text'] = f"{filename}.png captured!"
 
@@ -137,15 +145,18 @@ class MainMenu(tk.Frame):
     def start_snapping(self):
         # only activate snapping when all inputs are valid
         if self.check_valid_inputs():
-            
             self.snapping = True
 
     def stop_snapping(self):
+        if self.sound.get():
+            self.stop_sound.play()
         self.snapping = False
 
     def play_sound(self):
-        self.capture_sound.play()
-        
+        if self.sound.get():
+            self.capture_sound.play()
+
+
 def main():
     root = tk.Tk()
     root.resizable(False, False)
