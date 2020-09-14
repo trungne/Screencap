@@ -2,6 +2,7 @@ import tkinter as tk
 import mss
 import os
 import string
+import playsound
 
 
 class NoFilenameEntered(Exception):
@@ -15,7 +16,6 @@ class MainMenu(tk.Frame):
         # show the Frame.
         self.pack()
         self.parent = parent
-
         '''The program continuously scans to see if user has pressed screenshot button
         When the screenshot button is press, self.snapping is changed to True
         Then the program will capture screen according to the screenshot mode (single or continuous)'''
@@ -104,7 +104,7 @@ class MainMenu(tk.Frame):
             mon = sct.monitors[monitor_number]
             sct_img = sct.grab(mon)
             mss.tools.to_png(sct_img.rgb, sct_img.size, output=filename + '.png')
-
+        playsound.playsound('screencapturesound.mp3')
         # display result accordingly
         self.status_bar['text'] = f"{filename}.png captured!"
 
