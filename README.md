@@ -1,6 +1,6 @@
 # Screencap: A programme to screencap and rename your file(s)
 To use the script, you have to install mss module and pygame. Use this to install necessary modules.
-'pip install -r requirements.txt' 
+'''pip install -r requirements.txt''' 
 
 There are 2 screenshot modes: single and continuous. 
 For single mode: Enter a filename and simply press Screencap.
