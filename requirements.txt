@@ -1,2 +1,6 @@
 mss==6.0.0
 
+
+playsound~=1.2.2
+future~=0.18.2
+pygame~=1.9.6
